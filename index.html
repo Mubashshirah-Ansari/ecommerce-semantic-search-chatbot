@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ShopAssist - Customer Support</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f5f7;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 430px;
+            height: 680px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+
+        .chat-header {
+            background: #111827;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bot-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .header-info h2 {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .online {
+            font-size: 12px;
+            color: #86efac;
+        }
+
+        /* Chat area */
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .message {
+            max-width: 80%;
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .bot-message {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+
+        .user-message {
+            background: #111827;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-name {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #4b5563;
+        }
+
+        /* Quick buttons */
+
+        .quick-actions {
+            padding: 0 20px 12px;
+            background: #f9fafb;
+        }
+
+        .quick-title {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .quick-button {
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quick-button:hover {
+            background: #111827;
+            color: white;
+        }
+
+        /* Input area */
+
+        .input-area {
+            display: flex;
+            padding: 14px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            gap: 8px;
+        }
+
+        #userInput {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 25px;
+            padding: 12px 15px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        #userInput:focus {
+            border-color: #111827;
+        }
+
+        #sendButton {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        #sendButton:hover {
+            background: #374151;
+        }
+
+        #sendButton:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Details */
+
+        .details {
+            margin-top: 8px;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+
+        /* Typing indicator */
+
+        .typing {
+            font-size: 12px;
+            color: #6b7280;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 500px) {
+
+            body {
+                align-items: stretch;
+            }
+
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="chat-container">
+
+    <!-- Header -->
+
+    <div class="chat-header">
+
+        <div class="bot-avatar">
+            🤖
+        </div>
+
+        <div class="header-info">
+
+            <h2>ShopAssist</h2>
+
+            <div class="online">
+                ● Online • Customer Support
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Chat messages -->
+
+    <div class="chat-box" id="chatBox">
+
+        <div class="message bot-message">
+
+            <div class="bot-name">
+                SHOPASSIST
+            </div>
+
+            Hello! 👋<br><br>
+
+            I'm your shopping assistant. I can help you with:
+
+            <br><br>
+
+            📦 Order tracking<br>
+            🔄 Returns and refunds<br>
+            💳 Payment issues<br>
+            🚚 Delivery questions<br>
+
+            <br>
+
+            How can I help you today?
+
+        </div>
+
+    </div>
+
+
+    <!-- Quick actions -->
+
+    <div class="quick-actions">
+
+        <div class="quick-title">
+            Quick help
+        </div>
+
+        <div class="quick-buttons">
+
+            <button
+                class="quick-button"
+                onclick="quickMessage('Where is my order?')">
+                📦 Track Order
+            </button>
+
+            <button
+                class="quick-button"
+                onclick="quickMessage('I want to get a refund')">
+                🔄 Refund
+            </button>
+
+            <button
+                class="quick-button"
+                onclick="quickMessage('I have a problem with my payment')">
+                💳 Payment
+            </button>
+
+            <button
+                class="quick-button"
+                onclick="quickMessage('When will my order arrive?')">
+                🚚 Delivery
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Input -->
+
+    <div class="input-area">
+
+        <input
+            type="text"
+            id="userInput"
+            placeholder="Type your message..."
+            onkeydown="handleKeyPress(event)"
+        >
+
+        <button
+            id="sendButton"
+            onclick="sendMessage()">
+            ➤
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function sendMessage() {
+
+    const input = document.getElementById("userInput");
+
+    const chatBox = document.getElementById("chatBox");
+
+    const sendButton = document.getElementById("sendButton");
+
+    const query = input.value.trim();
+
+    if (!query) {
+        return;
+    }
+
+
+    /* Show user message */
+
+    const userMessage = document.createElement("div");
+
+    userMessage.className = "message user-message";
+
+    userMessage.innerText = query;
+
+    chatBox.appendChild(userMessage);
+
+    input.value = "";
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+
+    /* Disable button */
+
+    sendButton.disabled = true;
+
+
+    /* Typing message */
+
+    const typing = document.createElement("div");
+
+    typing.className = "typing";
+
+    typing.innerText = "ShopAssist is thinking...";
+
+    chatBox.appendChild(typing);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+
+    try {
+
+        const response = await fetch("/api/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                query: query
+            })
+
+        });
+
+
+        const data = await response.json();
+
+
+        typing.remove();
+
+
+        /* Bot message */
+
+        const botMessage = document.createElement("div");
+
+        botMessage.className = "message bot-message";
+
+
+        if (data.error) {
+
+            botMessage.innerHTML =
+                "<div class='bot-name'>SHOPASSIST</div>" +
+                data.error;
+
+        }
+
+        else {
+
+            let details = "";
+
+            if (data.intent) {
+
+                details =
+                    "<div class='details'>" +
+                    "Intent: " +
+                    escapeHtml(data.intent) +
+                    " • Similarity: " +
+                    Number(data.similarity).toFixed(3);
+
+                if (data.order_number) {
+
+                    details +=
+                        " • Order: " +
+                        escapeHtml(data.order_number);
+
+                }
+
+                details += "</div>";
+
+            }
+
+
+            botMessage.innerHTML =
+                "<div class='bot-name'>SHOPASSIST</div>" +
+                escapeHtml(data.response) +
+                details;
+
+        }
+
+
+        chatBox.appendChild(botMessage);
+
+
+    }
+
+    catch (error) {
+
+        typing.remove();
+
+
+        const errorMessage = document.createElement("div");
+
+        errorMessage.className = "message bot-message";
+
+        errorMessage.innerHTML =
+            "<div class='bot-name'>SHOPASSIST</div>" +
+            "Sorry, I'm having trouble connecting right now. Please try again.";
+
+        chatBox.appendChild(errorMessage);
+
+    }
+
+
+    sendButton.disabled = false;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+
+
+/* Quick buttons */
+
+function quickMessage(message) {
+
+    document.getElementById("userInput").value = message;
+
+    sendMessage();
+
+}
+
+
+/* Enter key */
+
+function handleKeyPress(event) {
+
+    if (event.key === "Enter") {
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* Security */
+
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": [
+        "*.ipynb",
+        "README.md"
+      ]
+    }
+  }
+}

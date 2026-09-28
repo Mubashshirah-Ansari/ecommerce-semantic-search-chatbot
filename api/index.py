@@ -1,13 +1,16 @@
 import re
 import pandas as pd
+
 from fastapi import FastAPI
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
 
 app = FastAPI()
 
-# Load the same dataset used in the Colab case study
+
+# Load the same dataset used in the case study
 DATASET_URL = (
     "https://huggingface.co/datasets/bitext/"
     "Bitext-customer-support-llm-chatbot-training-dataset/"
@@ -17,7 +20,8 @@ DATASET_URL = (
 
 df = pd.read_csv(DATASET_URL)
 
-# Clean the customer questions
+
+# Clean customer questions
 df["clean_instruction"] = df["instruction"].apply(
     lambda x: re.sub(r"\{\{.*?\}\}", "", x)
 )
@@ -29,27 +33,34 @@ df["clean_instruction"] = (
     .str.lower()
 )
 
-# Load the same embedding model used in the case study
-model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Create embeddings for the training questions
-train_embeddings = model.encode(
-    df["clean_instruction"].tolist(),
-    show_progress_bar=False
+# Create TF-IDF vectors
+vectorizer = TfidfVectorizer(
+    ngram_range=(1, 2),
+    lowercase=True
+)
+
+train_vectors = vectorizer.fit_transform(
+    df["clean_instruction"]
 )
 
 
 def semantic_search(query):
+
+    # Clean the user query
     clean_query = re.sub(r"\{\{.*?\}\}", "", query)
     clean_query = re.sub(r"\s+", " ", clean_query).strip().lower()
 
-    query_embedding = model.encode([clean_query])
+    # Convert query into TF-IDF vector
+    query_vector = vectorizer.transform([clean_query])
 
+    # Calculate cosine similarity
     similarities = cosine_similarity(
-        query_embedding,
-        train_embeddings
+        query_vector,
+        train_vectors
     )[0]
 
+    # Find best matching question
     best_index = similarities.argmax()
 
     matched_question = df.iloc[best_index]["instruction"]
@@ -61,6 +72,7 @@ def semantic_search(query):
 
 
 def extract_order_number(query):
+
     pattern = r"\b\d{4,}\b"
     match = re.search(pattern, query)
 
@@ -71,6 +83,7 @@ def extract_order_number(query):
 
 
 def fill_parameters(response, order_number):
+
     if order_number:
         response = response.replace(
             "{{Order Number}}",
@@ -80,7 +93,7 @@ def fill_parameters(response, order_number):
     return response
 
 
-def chatbot_search(query, threshold=0.70):
+def chatbot_search(query, threshold=0.20):
 
     matched_question, intent, score, response = semantic_search(query)
 
@@ -116,6 +129,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/api")
 def home():
+
     return {
         "message": "E-commerce Semantic Search Chatbot API"
     }

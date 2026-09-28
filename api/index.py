@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 import pandas as pd
 
 from fastapi import FastAPI
@@ -8,7 +9,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 app = FastAPI()
-
+@app.get("/")
+def homepage():
+    html_path = Path(__file__).resolve().parent.parent / "index.html"
+    return html_path.read_text(encoding="utf-8")
 
 # Load the same dataset used in the case study
 DATASET_URL = (

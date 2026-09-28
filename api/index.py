@@ -3,13 +3,14 @@ from pathlib import Path
 import pandas as pd
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 app = FastAPI()
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def homepage():
     html_path = Path(__file__).resolve().parent.parent / "index.html"
     return html_path.read_text(encoding="utf-8")
